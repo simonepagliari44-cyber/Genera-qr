@@ -1,2 +1,114 @@
-# Genera-qr
-App e sito web per generare qr
+<div align="center">
+
+# 📱 **Generatore QR** 🚀
+
+### *Soluzione Integrata Web & Mobile per la Generazione Vettoriale*
+
+---
+
+</div>
+
+## 📌 **Panoramica del Progetto**
+
+Il progetto **Generatore QR** nasce con l'obiettivo di offrire un'esperienza utente fluida, moderna ed efficiente sia come **applicazione web** che come **applicazione mobile native/cross-platform**. 
+
+La struttura dell'architettura è progettata per garantire elevate prestazioni, scalabilità e una perfetta sincronizzazione dei dati tra tutte le piattaforme supportate.
+
+---
+
+## ✨ **Caratteristiche Principali**
+
+* 🌐 **Architettura Multi-Piattaforma:** Un'unica logica applicativa ottimizzata sia per la fruizione via browser web sia per l'utilizzo su dispositivi mobili.
+* 🎨 **Interfaccia Utente Moderna:** Design reattivo, pulito e intuitivo, focalizzato sulla facilità d'uso e sull'accessibilità.
+* ⚡ **Prestazioni Elevate:** Ottimizzazione delle risorse e caricamento rapido per un'esperienza d'uso fluida su qualsiasi schermo.
+* 🔄 **Sincronizzazione in Tempo Reale:** Gestione uniforme dei dati tra versione Web e Mobile per garantire continuità d'uso.
+* 🛠️ **Motore Vettoriale Custom:** Generazione diretta di elementi grafici in formato SVG senza dipendenze pesanti.
+
+---
+
+## 📐 **Architettura e Modulo Visivo**
+
+L'applicazione integra un componente di grafica vettoriale custom (**SVG**) sviluppato appositamente per gestire elementi visivi scalabili, ad alta definizione e leggerissimi in termini di prestazioni.
+
+Ecco il codice SVG isolato per la rappresentazione visiva dell'icona (QR Code decorativo stilizzato):
+
+```xml
+<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <!-- Sfondo Sfumato -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    
+    <!-- Sfumatura per Moduli QR -->
+    <linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base e Bordo Arrotondato -->
+  <rect width="200" height="200" rx="36" fill="url(#bgGrad)"/>
+  <rect x="10" y="10" width="180" height="180" rx="28" fill="none" stroke="#334155" stroke-width="2"/>
+
+  <!-- === POSIZIONATORE SUP. SX === -->
+  <rect x="25" y="25" width="45" height="45" rx="10" fill="none" stroke="url(#qrGrad)" stroke-width="6"/>
+  <rect x="37" y="37" width="21" height="21" rx="5" fill="url(#qrGrad)"/>
+
+  <!-- === POSIZIONATORE SUP. DX === -->
+  <rect x="130" y="25" width="45" height="45" rx="10" fill="none" stroke="url(#qrGrad)" stroke-width="6"/>
+  <rect x="142" y="37" width="21" height="21" rx="5" fill="url(#qrGrad)"/>
+
+  <!-- === POSIZIONATORE INF. SX === -->
+  <rect x="25" y="130" width="45" height="45" rx="10" fill="none" stroke="url(#qrGrad)" stroke-width="6"/>
+  <rect x="37" y="142" width="21" height="21" rx="5" fill="url(#qrGrad)"/>
+
+  <!-- === MODULI DATI DECORATIVI (NON SCANSIONABILI) === -->
+  <!-- Riga 1 -->
+  <rect x="80" y="25" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="95" y="25" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="110" y="25" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <!-- Riga 2 -->
+  <rect x="80" y="40" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="110" y="40" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <!-- Riga 3 -->
+  <rect x="80" y="55" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="95" y="55" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <!-- Blocco Centrale -->
+  <rect x="25" y="80" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="40" y="80" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="60" y="80" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="80" y="80" width="25" height="25" rx="6" fill="#F43F5E"/> <!-- Accento Cromatico -->
+  <rect x="115" y="80" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="130" y="80" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="150" y="80" width="25" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <!-- Riga Intermedia -->
+  <rect x="25" y="95" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="55" y="95" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="115" y="95" width="10" height="25" rx="2" fill="url(#qrGrad)"/>
+  <rect x="135" y="95" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="165" y="95" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <!-- Area Inferiore Destra -->
+  <rect x="80" y="115" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="95" y="115" width="25" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="130" y="115" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="150" y="115" width="25" height="25" rx="4" fill="url(#qrGrad)"/>
+
+  <rect x="80" y="130" width="10" height="25" rx="2" fill="url(#qrGrad)"/>
+  <rect x="100" y="130" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="115" y="130" width="25" height="10" rx="2" fill="url(#qrGrad)"/>
+
+  <rect x="95" y="150" width="10" height="25" rx="2" fill="url(#qrGrad)"/>
+  <rect x="115" y="150" width="10" height="10" rx="2" fill="#F43F5E"/>
+  <rect x="130" y="150" width="20" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="155" y="150" width="20" height="20" rx="4" fill="url(#qrGrad)"/>
+
+  <rect x="80" y="165" width="10" height="10" rx="2" fill="url(#qrGrad)"/>
+  <rect x="115" y="165" width="35" height="10" rx="2" fill="url(#qrGrad)"/>
+</svg>
