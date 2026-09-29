@@ -1,8 +1,9 @@
 <div align="center">
 
 # 📱 **Generatore QR** 🚀
+<img src="Sito%20Web/favicon.svg" alt="Icona Generatore QR" width="120" height="120" />
 
-### *Soluzione Integrata Web & Mobile per la Generazione Vettoriale*
+### *Soluzione Web & Mobile per la Generazione Vettoriale*
 
 ---
 
