@@ -48,7 +48,7 @@ L'app funziona **completamente offline**: nessuna connessione internet richiesta
 
 ## 📥 **Installazione**
 
-1. Scarica il file `app-debug.apk` da questa release.
+1. Scarica il file `Generatore-QR` da questa release.
 2. Copialo sul telefono e aprilo.
 3. Al primo avvio concedi il permesso di accesso all'archivio quando richiesto.
 4. Premi **Scarica Immagine PNG**: l'immagine finisce nella galleria.
