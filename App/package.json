@@ -1,0 +1,35 @@
+{
+  "name": "generatore-qr",
+  "version": "1.0.0",
+  "description": "Generatore QR - app Capacitor",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web": "node scripts/prepare-web.mjs",
+    "css": "tailwindcss -i src/app.css -o www/assets/app.css --minify",
+    "build:web": "npm run web && npm run css",
+    "native": "node scripts/install-native.mjs",
+    "sync": "npm run build:web && cap sync android",
+    "open": "cap open android",
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug",
+    "apk:release": "npm run sync && cd android && ./gradlew assembleRelease",
+    "assets": "node scripts/make-assets.mjs && capacitor-assets generate --android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "private": "true",
+  "dependencies": {
+    "@capacitor/core": "^7.6.9",
+    "@capacitor/filesystem": "^7.1.9",
+    "@capacitor/share": "^7.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/cli": "^7.6.9",
+    "puppeteer-core": "^25.12.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^3.4.19"
+  }
+}

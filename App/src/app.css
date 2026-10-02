@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fallback per WebView molto vecchi (Android 7 = Chrome 51, senza flex-gap) */
+@supports not (gap: 1px) {
+  .flex.gap-1 > * + * { margin-left: 0.25rem; }
+  .flex.gap-2 > * + * { margin-left: 0.5rem; }
+  .flex.gap-3 > * + * { margin-left: 0.75rem; }
+  .flex.gap-4 > * + * { margin-left: 1rem; }
+}
