@@ -13,7 +13,8 @@
     "open": "cap open android",
     "apk": "npm run sync && cd android && ./gradlew assembleDebug",
     "apk:release": "npm run sync && cd android && ./gradlew assembleRelease",
-    "assets": "node scripts/make-assets.mjs && capacitor-assets generate --android"
+    "assets": "node scripts/make-assets.mjs && capacitor-assets generate --android",
+    "vendor": "node scripts/vendor-libs.mjs"
   },
   "keywords": [],
   "author": "",

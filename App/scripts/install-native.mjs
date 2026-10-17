@@ -64,7 +64,9 @@ let manifest = readFileSync(manifestPath, 'utf8');
 const permissions = [
   '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />',
   '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />',
-  '<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />'
+  '<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />',
+  '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />',
+  '<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />'
 ];
 
 const missing = permissions.filter((line) => !manifest.includes(line));

@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#facc15">
     <title>Generatore QR</title>
-    <link rel="icon" type="image/svg+xml" href="Sito%20Web/favicon.svg">
-    <link rel="apple-touch-icon" href="Sito%20Web/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <meta name="theme-color" content="#facc15">
+    <!-- Leaflet CSS & JS per Mappa Interattiva -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Google Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=location_on" />
     <style>
         /* Comportamento da app nativa: niente zoom, niente selezione, niente rimbalzo */
         html, body {
@@ -94,10 +98,10 @@
 
     <!-- Layout Principale a Schermo Intero -->
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 w-full">
-        
+
         <!-- Form Configurazione (Sinistra) -->
         <div class="lg:col-span-7 p-6 md:p-10 space-y-6 overflow-y-auto">
-            
+
             <!-- URL -->
             <div id="section-url" class="tab-content space-y-4">
                 <h2 class="text-xl font-bold text-slate-800">Indirizzo Web / Link</h2>
@@ -191,9 +195,33 @@
                 </div>
             </div>
 
-            <!-- POSIZIONE GPS -->
+            <!-- POSIZIONE GPS CON AUTOCOMPLETE & SUGGERIMENTI MATERIAL SYMBOLS -->
             <div id="section-geo" class="tab-content hidden space-y-4">
                 <h2 class="text-xl font-bold text-slate-800">Coordinate Geografiche (GPS)</h2>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="getCurrentLocation()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-slate-900 text-sm font-semibold rounded-lg shadow-sm transition flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base">location_on</span>
+                        Usa Posizione Attuale
+                    </button>
+                </div>
+
+                <!-- Barra di ricerca Luogo / Via con Suggerimenti Live -->
+                <div class="relative">
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Cerca Via, Piazza o Luogo</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="geo-search-input" placeholder="Es. Via Roma, Milano..." autocomplete="off" class="flex-1 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none">
+                        <button type="button" onclick="searchLocation()" class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition">Cerca</button>
+                    </div>
+                    <!-- Menu Tendina Suggerimenti Live -->
+                    <ul id="geo-suggestions" class="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden divide-y divide-slate-100 text-sm"></ul>
+                </div>
+
+                <!-- Mappa Zoomabile -->
+                <div class="relative w-full h-64 rounded-xl overflow-hidden border border-slate-300 shadow-inner z-0">
+                    <div id="map" class="w-full h-full"></div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Latitudine</label>
@@ -287,7 +315,17 @@
             <!-- Personalizzazione Grafica & Logo -->
             <div class="border-t border-slate-300 pt-6 space-y-4">
                 <h3 class="text-md font-semibold text-slate-700">Personalizzazione & Logo</h3>
-                
+
+                <!-- Sezione: Selettore Livello Dettaglio -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Dettaglio</label>
+                    <select id="qr-density" class="w-full p-3 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none text-slate-800">
+                        <option value="H" selected>Dettaglio Alto</option>
+                        <option value="M">Dettaglio Medio</option>
+                        <option value="L">Dettaglio Basso</option>
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Immagine / Logo Centrale</label>
                     <div class="flex items-center gap-3">
@@ -302,7 +340,7 @@
                         <input type="range" id="logo-size" min="15" max="30" value="22" class="w-full accent-yellow-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Risoluzione QR</label>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Risoluzione Immagine (px)</label>
                         <select id="qr-size" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none">
                             <option value="300" selected>300 x 300 px</option>
                             <option value="500">500 x 500 px</option>
@@ -328,7 +366,7 @@
         <!-- Anteprima e Download (Destra - Full height / Sticky) -->
         <div class="lg:col-span-5 bg-slate-200 p-6 md:p-10 flex flex-col items-center justify-center border-t lg:border-t-0 lg:border-l border-slate-300">
             <h2 class="text-xl font-bold text-slate-800 mb-6">Anteprima Finale</h2>
-            
+
             <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-300 min-h-[300px] min-w-[300px] flex items-center justify-center mb-6">
                 <div id="qrcode-hidden" class="hidden"></div>
                 <canvas id="final-canvas" class="max-w-full h-auto"></canvas>
@@ -397,21 +435,15 @@
             if (gallery && gallery.ensureFolder) {
                 gallery.ensureFolder()
                     .then(function (info) {
-                        if (info && info.created) {
-                            console.log('Cartella creata: ' + info.path);
-                        }
+                        if (info && info.created) console.log('Cartella creata: ' + info.path);
                     })
                     .catch(function () {});
             }
 
             if (gallery && gallery.requestStoragePermission) {
                 gallery.requestStoragePermission()
-                    .then(function (info) {
-                        console.log('Permesso archivio: ' + JSON.stringify(info));
-                    })
-                    .catch(function (err) {
-                        console.warn('Permesso archivio non disponibile:', err);
-                    });
+                    .then(function (info) { console.log('Permesso archivio: ' + JSON.stringify(info)); })
+                    .catch(function (err) { console.warn('Permesso archivio non disponibile:', err); });
             }
         }
 
@@ -419,6 +451,9 @@
 
         let currentTab = 'url';
         let logoImage = null;
+        let map = null;
+        let mapMarker = null;
+        let autocompleteTimer = null;
 
         // Gestione Drag Scroll su Desktop/PC con Mouse
         const scrollContainer = document.getElementById('categories-bar');
@@ -455,8 +490,159 @@
             document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
             document.getElementById(`section-${tabId}`).classList.remove('hidden');
 
+            if (tabId === 'geo') {
+                setTimeout(initMap, 100);
+            }
+
             generateQR();
         }
+
+        // Inizializzazione Mappa Interattiva (Leaflet.js)
+        function initMap() {
+            if (!map) {
+                const defaultLat = 41.9028;
+                const defaultLng = 12.4964;
+
+                map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                mapMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+                mapMarker.on('dragend', function (e) {
+                    const coord = e.target.getLatLng();
+                    updateCoordinates(coord.lat, coord.lng);
+                });
+
+                map.on('click', function (e) {
+                    mapMarker.setLatLng(e.latlng);
+                    updateCoordinates(e.latlng.lat, e.latlng.lng);
+                });
+            } else {
+                map.invalidateSize();
+            }
+        }
+
+        function updateCoordinates(lat, lng) {
+            const formattedLat = parseFloat(lat).toFixed(6);
+            const formattedLng = parseFloat(lng).toFixed(6);
+            document.getElementById('geo-lat').value = formattedLat;
+            document.getElementById('geo-lng').value = formattedLng;
+            generateQR();
+        }
+
+        // Geolocalizzazione Posizione Attuale
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        if (map) {
+                            map.setView([lat, lng], 16);
+                            mapMarker.setLatLng([lat, lng]);
+                        }
+                        updateCoordinates(lat, lng);
+                    },
+                    (error) => {
+                        alert("Impossibile ottenere la posizione attuale. Verificare i permessi del browser.");
+                    }
+                );
+            } else {
+                alert("La geolocalizzazione non è supportata da questo browser.");
+            }
+        }
+
+        // Ricerca Luogo / Via tramite Nominatim API
+        function searchLocation() {
+            const query = document.getElementById('geo-search-input').value.trim();
+            if (!query) return;
+
+            hideSuggestions();
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        selectPlace(data[0].lat, data[0].lon, data[0].display_name);
+                    } else {
+                        alert("Nessun luogo o via trovata.");
+                    }
+                })
+                .catch(() => alert("Errore durante la ricerca."));
+        }
+
+        // Gestione Autocomplete in tempo reale con Material Symbol "location_on"
+        function fetchSuggestions(query) {
+            if (query.length < 3) {
+                hideSuggestions();
+                return;
+            }
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    const listContainer = document.getElementById('geo-suggestions');
+                    listContainer.innerHTML = '';
+
+                    if (!data || data.length === 0) {
+                        hideSuggestions();
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'p-3 hover:bg-yellow-50 cursor-pointer transition text-slate-700 flex items-center gap-2';
+                        li.innerHTML = `
+                            <span class="material-symbols-outlined text-yellow-600 shrink-0">location_on</span>
+                            <span class="truncate">${item.display_name}</span>
+                        `;
+                        li.onclick = () => selectPlace(item.lat, item.lon, item.display_name);
+                        listContainer.appendChild(li);
+                    });
+
+                    listContainer.classList.remove('hidden');
+                })
+                .catch(() => hideSuggestions());
+        }
+
+        function selectPlace(lat, lon, displayName) {
+            const latitude = parseFloat(lat);
+            const longitude = parseFloat(lon);
+
+            document.getElementById('geo-search-input').value = displayName;
+            hideSuggestions();
+
+            if (map) {
+                map.setView([latitude, longitude], 16);
+                mapMarker.setLatLng([latitude, longitude]);
+            }
+            updateCoordinates(latitude, longitude);
+        }
+
+        function hideSuggestions() {
+            const listContainer = document.getElementById('geo-suggestions');
+            listContainer.classList.add('hidden');
+        }
+
+        // Listener input con Debounce per Autocomplete
+        document.getElementById('geo-search-input').addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            clearTimeout(autocompleteTimer);
+            autocompleteTimer = setTimeout(() => {
+                fetchSuggestions(val);
+            }, 300);
+        });
+
+        // Chiude la lista suggerimenti se si clicca fuori
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#section-geo')) {
+                hideSuggestions();
+            }
+        });
 
         function formatICalDate(dateStr) {
             if (!dateStr) return '';
@@ -479,7 +665,7 @@
             switch(currentTab) {
                 case 'url':
                     return document.getElementById('url-input').value.trim();
-                
+
                 case 'whatsapp': {
                     const rawPhone = document.getElementById('wa-phone').value;
                     const phone = formatPhoneNumber(rawPhone);
@@ -595,6 +781,19 @@
             }
         }
 
+        // Mappatura Livelli di Correzione Errori per il Dettaglio
+        function getCorrectLevel(densityValue) {
+            switch(densityValue) {
+                case 'L':
+                    return QRCode.CorrectLevel.L;
+                case 'M':
+                    return QRCode.CorrectLevel.M;
+                case 'H':
+                default:
+                    return QRCode.CorrectLevel.H;
+            }
+        }
+
         function generateQR() {
             const payload = buildPayload();
             const hiddenContainer = document.getElementById('qrcode-hidden');
@@ -603,6 +802,10 @@
             const size = parseInt(document.getElementById('qr-size').value);
             const colorDark = document.getElementById('color-dark').value;
             const colorLight = document.getElementById('color-light').value;
+            
+            // Lettura livello scelto dall'utente
+            const densityVal = document.getElementById('qr-density').value;
+            const level = getCorrectLevel(densityVal);
 
             if (!payload) {
                 updateDownloadButtonState(false);
@@ -618,7 +821,7 @@
                 height: size,
                 colorDark: colorDark,
                 colorLight: colorLight,
-                correctLevel: QRCode.CorrectLevel.H
+                correctLevel: level
             });
 
             setTimeout(renderFinalCanvas, 50);
@@ -628,7 +831,7 @@
             const finalCanvas = document.getElementById('final-canvas');
             const ctx = finalCanvas.getContext('2d');
             const size = parseInt(document.getElementById('qr-size').value);
-            
+
             finalCanvas.width = size;
             finalCanvas.height = size;
 
@@ -695,7 +898,7 @@
             renderFinalCanvas();
         }
 
-        // 2. FUNZIONE DI DOWNLOAD (Nativa -> Galleria / Browser -> Cartella Download)
+        // 2. DOWNLOAD: su Android salva in Galleria/Immagini/Generatore-QR, su web scarica il file
         function pad2(value) {
             return value < 10 ? '0' + value : String(value);
         }
@@ -712,9 +915,7 @@
         function downloadQR() {
             const fileName = buildFileName();
 
-            const promise = isNativeApp() ? saveNative(fileName) : saveWeb(fileName);
-
-            promise
+            (isNativeApp() ? saveNative(fileName) : saveWeb(fileName))
                 .then(function (message) { if (message) showStatus(message, 'ok'); })
                 .catch(function (err) {
                     console.error('Download non riuscito:', err);
@@ -731,7 +932,7 @@
                         .then(function (result) {
                             if (result && result.saved) {
                                 resolve(result.location === 'gallery'
-                                    ? 'Immagine salvata in Galleria / Immagini / ' + (result.album || 'Generatore QR')
+                                    ? 'Immagine salvata in Galleria / Immagini / ' + (result.album || 'Generatore-QR')
                                     : 'Immagine salvata in ' + (result.path || 'Archivio App'));
                             } else {
                                 reject(new Error('Salvataggio non riuscito'));
@@ -771,7 +972,7 @@
             });
         }
 
-        // 3. CONDIVISIONE DEL CODICE QR
+        // 3. CONDIVISIONE: si apre solo quando l utente preme "Condividi QR"
         function shareQR() {
             if (!isNativeApp()) {
                 showStatus('La condivisione e\' disponibile solo nell\'app Android', 'error');
@@ -802,9 +1003,18 @@
             element.addEventListener('change', generateQR);
         });
 
+        // Invio ricerca posizione con il tasto Invio
+        document.getElementById('geo-search-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchLocation();
+            }
+        });
+
         window.onload = function() {
             generateQR();
         };
     </script>
 </body>
 </html>
+```
